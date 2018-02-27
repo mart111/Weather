@@ -1,7 +1,12 @@
 package com.example.macbookair.weather;
 
+import android.inputmethodservice.Keyboard;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -58,32 +63,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onResponse(Call<WeatherModel> call, Response<WeatherModel> response) {
 
-                if (response.isSuccessful()) {
-                    weather = response.body();
-                    txtCityName.setText(weather.getLocation().getName());
-                    txtTemperature.setText(String.valueOf(weather.getCurrent().getTempC()));
-                    txtCondition.setText(weather.getCurrent().getCondition().getText());
-                    String urlImage = weather.getCurrent().getCondition().getIcon();
-                    urlImage = "https:" + urlImage;
+                if (isNetworkAvailable()) {
+                    if (response.isSuccessful()) {
+                        weather = response.body();
+                        txtCityName.setText(weather.getLocation().getName());
+                        txtTemperature.setText(String.valueOf(weather.getCurrent().getTempC()));
+                        txtCondition.setText(weather.getCurrent().getCondition().getText());
+                        String urlImage = weather.getCurrent().getCondition().getIcon();
+                        urlImage = "https:" + urlImage;
 
-                    imgCelsius.setVisibility(View.VISIBLE);
+                        imgCelsius.setVisibility(View.VISIBLE);
 
-                    Glide.with(MainActivity.this)
-                            .load(urlImage)
-                            .apply(new RequestOptions().error(null).circleCrop())
-                            .into(imgWeather);
+                        Glide.with(MainActivity.this)
+                                .load(urlImage)
+                                .apply(new RequestOptions().error(null).circleCrop())
+                                .into(imgWeather);
+                    } else
+                        Toast.makeText(getApplicationContext(), "Please enter valid city", Toast.LENGTH_SHORT).show();
                 } else
-                    Toast.makeText(getApplicationContext(), "Please enter valid city", Toast.LENGTH_SHORT).show();
+
+                    Toast.makeText(getApplicationContext(), "Please connect to Internet", Toast.LENGTH_SHORT).show();
+
 
             }
 
             @Override
             public void onFailure(Call<WeatherModel> call, Throwable t) {
 
-                if (t instanceof IOException) {
-                    Toast.makeText(getApplicationContext(), "Please check your Internet", Toast.LENGTH_SHORT).show();
-                }
+
             }
         });
+    }
+
+    public boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }
