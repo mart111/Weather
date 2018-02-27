@@ -79,5 +79,11 @@
         android:layout_toEndOf="@id/edittext"
         android:background="@drawable/search" />
 
+    <com.felipecsl.gifimageview.library.GifImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/gif"
+        android:layout_below="@id/edittext"/>
+
 
 </RelativeLayout>

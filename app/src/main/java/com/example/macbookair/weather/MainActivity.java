@@ -1,12 +1,9 @@
 package com.example.macbookair.weather;
 
-import android.inputmethodservice.Keyboard;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -17,8 +14,10 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.macbookair.weather.model.WeatherModel;
+import com.felipecsl.gifimageview.library.GifImageView;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -33,25 +32,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private EditText editText;
     private ImageButton search;
     private ImageView imgWeather, imgCelsius;
+    private GifImageView gif;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        imgCelsius = findViewById(R.id.celsius);
-        txtCondition = findViewById(R.id.txtCondition);
-        txtCityName = findViewById(R.id.txtCityName);
-        txtTemperature = findViewById(R.id.txtTemperature);
-        search = findViewById(R.id.searchBtn);
-        editText = findViewById(R.id.edittext);
-        imgWeather = findViewById(R.id.imgWeather);
+        initViews();
 
         apiInterface = WeatherApi.getWeatherApi().create(ApiInterface.class);
 
         imgCelsius.setVisibility(View.INVISIBLE);
 
+        //animate();
+
         search.setOnClickListener(this);
+
 
     }
 
@@ -100,5 +97,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    private void animate() {
+        try {
+            InputStream ip = getAssets().open("sky.gif");
+            byte[] bytes = new byte[ip.available()];
+            ip.read(bytes);
+            ip.close();
+            gif.setBytes(bytes);
+            gif.setFramesDisplayDuration(100);
+            gif.startAnimation();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initViews() {
+        imgCelsius = findViewById(R.id.celsius);
+        txtCondition = findViewById(R.id.txtCondition);
+        txtCityName = findViewById(R.id.txtCityName);
+        txtTemperature = findViewById(R.id.txtTemperature);
+        search = findViewById(R.id.searchBtn);
+        editText = findViewById(R.id.edittext);
+        imgWeather = findViewById(R.id.imgWeather);
+        gif = findViewById(R.id.gif);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        gif.stopAnimation();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        gif.clear();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        gif.startAnimation();
     }
 }
