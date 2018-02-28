@@ -14,10 +14,6 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.macbookair.weather.model.WeatherModel;
-import com.felipecsl.gifimageview.library.GifImageView;
-
-import java.io.IOException;
-import java.io.InputStream;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -32,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private EditText editText;
     private ImageButton search;
     private ImageView imgWeather, imgCelsius;
-    private GifImageView gif;
+    
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +40,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         apiInterface = WeatherApi.getWeatherApi().create(ApiInterface.class);
 
         imgCelsius.setVisibility(View.INVISIBLE);
-
-        //animate();
 
         search.setOnClickListener(this);
 
@@ -99,20 +93,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    private void animate() {
-        try {
-            InputStream ip = getAssets().open("sky.gif");
-            byte[] bytes = new byte[ip.available()];
-            ip.read(bytes);
-            ip.close();
-            gif.setBytes(bytes);
-            gif.setFramesDisplayDuration(100);
-            gif.startAnimation();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void initViews() {
         imgCelsius = findViewById(R.id.celsius);
         txtCondition = findViewById(R.id.txtCondition);
@@ -121,24 +101,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         search = findViewById(R.id.searchBtn);
         editText = findViewById(R.id.edittext);
         imgWeather = findViewById(R.id.imgWeather);
-        gif = findViewById(R.id.gif);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        gif.stopAnimation();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        gif.clear();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        gif.startAnimation();
     }
 }
